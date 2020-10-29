@@ -1,9 +1,13 @@
 package hu.bme.aut.freelancer_spring.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "vehicle_entity")
+@Getter @Setter
 public class Vehicle {
 
     @Id
@@ -33,32 +37,4 @@ public class Vehicle {
     @ManyToOne
     @JoinColumn(name = "ownerId", referencedColumnName = "id")
     private User owner;
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getZ() {
-        return z;
-    }
-
-    public String getWeightLimit() {
-        return weightLimit;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
 }

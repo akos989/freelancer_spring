@@ -1,10 +1,14 @@
 package hu.bme.aut.freelancer_spring.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "transfer_entity")
+@Getter @Setter
 public class Transfer {
 
     @Id
@@ -30,24 +34,4 @@ public class Transfer {
     @ManyToOne
     @JoinColumn(name = "townId", referencedColumnName = "id")
     private Town town;
-
-    public Long getId() {
-        return id;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public User getCarrier() {
-        return carrier;
-    }
-
-    public Vehicle getVehicle() {
-        return vehicle;
-    }
-
-    public Town getTown() {
-        return town;
-    }
 }
