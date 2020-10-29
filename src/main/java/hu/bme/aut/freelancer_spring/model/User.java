@@ -1,9 +1,14 @@
 package hu.bme.aut.freelancer_spring.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "user_entity")
+@Getter @Setter @NoArgsConstructor
 public class User {
 
     @Id
@@ -32,29 +37,5 @@ public class User {
         this.email = email;
         this.phonenumber = phonenumber;
         this.password = password;
-    }
-
-    public User() {
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhonenumber() {
-        return phonenumber;
-    }
-
-    public String getPassword() {
-        return password;
     }
 }

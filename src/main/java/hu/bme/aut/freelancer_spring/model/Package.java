@@ -2,12 +2,18 @@ package hu.bme.aut.freelancer_spring.model;
 
 import hu.bme.aut.freelancer_spring.model.enums.Size;
 import hu.bme.aut.freelancer_spring.model.enums.Status;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "package_entity")
+@Getter @Setter
 public class Package {
+    public Package() {
+        status = Status.WAITING;
+    }
 
     @Id
     @GeneratedValue(generator = "package_id_seq", strategy = GenerationType.SEQUENCE)
@@ -27,70 +33,26 @@ public class Package {
     @Column(name = "weight")
     private double weight;
 
-    @Column(name = "fromLat")
+    @Column(name = "from_lat")
     private double fromLat;
 
-    @Column(name = "fromLong")
+    @Column(name = "from_long")
     private double fromLong;
 
-    @Column(name = "toLat")
+    @Column(name = "to_lat")
     private double toLat;
 
-    @Column(name = "toLong")
+    @Column(name = "to_long")
     private double toLong;
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
     @ManyToOne
-    @JoinColumn(name = "senderId", referencedColumnName = "id")
+    @JoinColumn(name = "sender_id", referencedColumnName = "id")
     private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "transferId", referencedColumnName = "id")
+    @JoinColumn(name = "transfer_id", referencedColumnName = "id")
     private Transfer transfer;
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getSize() {
-        return size.name();
-    }
-
-    public double getWeight() {
-        return weight;
-    }
-
-    public double getFromLat() {
-        return fromLat;
-    }
-
-    public double getFromLong() {
-        return fromLong;
-    }
-
-    public double getToLat() {
-        return toLat;
-    }
-
-    public double getToLong() {
-        return toLong;
-    }
-
-    public String getStatus() {
-        return status.name();
-    }
-
-    public User getSender() {
-        return sender;
-    }
-
-    public Transfer getTransfer() {
-        return transfer;
-    }
 }

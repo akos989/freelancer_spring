@@ -1,9 +1,13 @@
 package hu.bme.aut.freelancer_spring.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "town_entity")
+@Getter @Setter
 public class Town {
 
     @Id
@@ -17,12 +21,4 @@ public class Town {
 
     @Column(name = "name")
     private String name;
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
 }
