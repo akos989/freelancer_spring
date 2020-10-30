@@ -32,7 +32,7 @@ public class Vehicle {
     private int z;
 
     @Column(name = "weight_limit")
-    private String weightLimit;
+    private double weightLimit;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
