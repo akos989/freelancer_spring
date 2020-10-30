@@ -31,10 +31,10 @@ public class Vehicle {
     @Column(name = "z")
     private int z;
 
-    @Column(name = "weightLimit")
+    @Column(name = "weight_limit")
     private String weightLimit;
 
     @ManyToOne
-    @JoinColumn(name = "ownerId", referencedColumnName = "id")
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
 }
