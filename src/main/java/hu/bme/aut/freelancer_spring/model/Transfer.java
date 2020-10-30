@@ -24,14 +24,14 @@ public class Transfer {
     private Date date;
 
     @ManyToOne
-    @JoinColumn(name = "carrierId", referencedColumnName = "id")
+    @JoinColumn(name = "carrier_id", referencedColumnName = "id")
     private User carrier;
 
     @ManyToOne
-    @JoinColumn(name = "vehicleId", referencedColumnName = "id")
+    @JoinColumn(name = "vehicle_id", referencedColumnName = "id")
     private Vehicle vehicle;
 
     @ManyToOne
-    @JoinColumn(name = "townId", referencedColumnName = "id")
+    @JoinColumn(name = "town_id", referencedColumnName = "id")
     private Town town;
 }
