@@ -1,9 +1,11 @@
 package hu.bme.aut.freelancer_spring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "town_entity")
@@ -21,4 +23,8 @@ public class Town {
 
     @Column(name = "name")
     private String name;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "town")
+    private List<Transfer> transfers;
 }
