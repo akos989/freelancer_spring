@@ -1,9 +1,11 @@
 package hu.bme.aut.freelancer_spring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "vehicle_entity")
@@ -37,4 +39,8 @@ public class Vehicle {
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "vehicle")
+    private List<Transfer> transfers;
 }
