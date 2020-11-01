@@ -1,10 +1,12 @@
 package hu.bme.aut.freelancer_spring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "transfer_entity")
@@ -34,4 +36,8 @@ public class Transfer {
     @ManyToOne
     @JoinColumn(name = "town_id", referencedColumnName = "id")
     private Town town;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "transfer")
+    private List<Package> packages;
 }
