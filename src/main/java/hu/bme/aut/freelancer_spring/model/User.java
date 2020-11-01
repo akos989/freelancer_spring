@@ -1,11 +1,13 @@
 package hu.bme.aut.freelancer_spring.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "user_entity")
@@ -30,14 +32,19 @@ public class User {
     @Column(name = "phonenumber")
     private String phonenumber;
 
-    @JsonIgnore
+    @Getter(AccessLevel.NONE)
     @Column(name = "password")
     private String password;
 
-    public User(String name, String email, String phonenumber, String password) {
-        this.name = name;
-        this.email = email;
-        this.phonenumber = phonenumber;
-        this.password = password;
-    }
+    @JsonIgnore
+    @OneToMany(mappedBy = "sender")
+    private List<Package> packages;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "carrier")
+    private List<Transfer> transfers;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "owner")
+    private List<Vehicle> vehicles;
 }
