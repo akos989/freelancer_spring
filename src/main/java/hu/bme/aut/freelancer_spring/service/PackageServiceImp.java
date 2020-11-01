@@ -20,8 +20,8 @@ public class PackageServiceImp implements PackageService {
 //    private final TransferRepository transferRepository;
 
     @Override
-    public List<PackageDto> findAll() {
-        return modelMapper.map(packageRepository.findAll(), List.class);
+    public List<Package> findAll() {
+        return packageRepository.findAll();
     }
 
     @Override
@@ -29,7 +29,6 @@ public class PackageServiceImp implements PackageService {
         var user = userRepository.findById(packageDto.getSenderId());
         if (user.isPresent()) {
             Package pack = modelMapper.map(packageDto, Package.class);
-            pack.setSender(user.get());
             packageRepository.save(pack);
             return pack.getId();
         } else {

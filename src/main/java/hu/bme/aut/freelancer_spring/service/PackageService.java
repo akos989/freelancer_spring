@@ -1,12 +1,13 @@
 package hu.bme.aut.freelancer_spring.service;
 
 import hu.bme.aut.freelancer_spring.dto.PackageDto;
+import hu.bme.aut.freelancer_spring.model.Package;
 
 import java.util.List;
 
 public interface PackageService {
 
-    List<PackageDto> findAll();
+    List<Package> findAll();
 
     Long save(PackageDto packageDto);
 

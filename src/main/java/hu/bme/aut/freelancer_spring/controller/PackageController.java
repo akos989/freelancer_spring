@@ -1,6 +1,7 @@
 package hu.bme.aut.freelancer_spring.controller;
 
 import hu.bme.aut.freelancer_spring.dto.PackageDto;
+import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.service.PackageService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ public class PackageController {
     private final PackageService packageService;
 
     @GetMapping
-    public ResponseEntity<List<PackageDto>> findAll() {
+    public ResponseEntity<List<Package>> findAll() {
         return ResponseEntity.ok(packageService.findAll());
     }
 
