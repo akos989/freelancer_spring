@@ -6,14 +6,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "package_entity")
 @Getter @Setter
 public class Package {
-    public Package() {
-        status = Status.WAITING;
-    }
 
     @Id
     @GeneratedValue(generator = "package_id_seq", strategy = GenerationType.SEQUENCE)
@@ -55,4 +53,12 @@ public class Package {
     @ManyToOne
     @JoinColumn(name = "transfer_id", referencedColumnName = "id")
     private Transfer transfer;
+
+    public Package() {
+        status = Status.WAITING;
+    }
+
+    public void setStatus(Status status) {
+        this.status = Objects.requireNonNullElse(status, Status.WAITING);
+    }
 }
