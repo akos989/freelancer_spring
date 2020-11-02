@@ -3,6 +3,7 @@ package hu.bme.aut.freelancer_spring.service;
 import hu.bme.aut.freelancer_spring.dto.PackageDto;
 import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.repository.PackageRepository;
+import hu.bme.aut.freelancer_spring.repository.TransferRepository;
 import hu.bme.aut.freelancer_spring.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -17,7 +18,7 @@ public class PackageServiceImp implements PackageService {
     private final PackageRepository packageRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper = new ModelMapper();
-//    private final TransferRepository transferRepository;
+    private final TransferRepository transferRepository;
 
     @Override
     public List<Package> findAll() {
@@ -29,6 +30,7 @@ public class PackageServiceImp implements PackageService {
         var user = userRepository.findById(packageDto.getSenderId());
         if (user.isPresent()) {
             Package pack = modelMapper.map(packageDto, Package.class);
+            findTransfer(pack);
             packageRepository.save(pack);
             return pack.getId();
         } else {
@@ -53,5 +55,16 @@ public class PackageServiceImp implements PackageService {
 //        var p = packageRepository.findById(packageId);
 //        p.
         return false;
+    }
+
+    private void findTransfer(Package pack) {
+        var transfers =
+                transferRepository.findAllByTownAndDateAfterOrderByDateAscCreatedAtAsc(pack.getTown(), pack.getCreatedAt());
+
+        var transfer = transfers.stream()
+                .filter(tran -> tran.fitPackage(pack))
+                .findFirst();
+
+        transfer.ifPresent(pack::setTransfer);
     }
 }

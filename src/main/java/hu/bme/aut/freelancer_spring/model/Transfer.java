@@ -23,7 +23,12 @@ public class Transfer {
     private Long id;
 
     @Column(name = "date")
+    @Temporal(TemporalType.DATE)
     private Date date;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt = new Date();
 
     @ManyToOne
     @JoinColumn(name = "carrier_id", referencedColumnName = "id")
@@ -40,4 +45,20 @@ public class Transfer {
     @JsonIgnore
     @OneToMany(mappedBy = "transfer")
     private List<Package> packages;
+
+    public boolean fitPackage(Package pack) {
+        if (date.before(pack.getDateLimit())) {
+            var weightSum = packages.stream()
+                    .mapToDouble(Package::getWeight)
+                    .sum();
+            boolean weightFit = weightSum + pack.getWeight() <= vehicle.getWeightLimit();
+            var packageCCSum = packages.stream()
+                    .mapToInt(p -> p.getSize().getCC())
+                    .sum();
+            boolean ccFit = packageCCSum + pack.getSize().getCC() <= vehicle.getCC();
+
+            return weightFit && ccFit;
+        }
+        return false;
+    }
 }
