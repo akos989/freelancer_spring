@@ -43,4 +43,8 @@ public class Vehicle {
     @JsonIgnore
     @OneToMany(mappedBy = "vehicle")
     private List<Transfer> transfers;
+
+    public int getCC() {
+        return x * y * z;
+    }
 }

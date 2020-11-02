@@ -27,4 +27,8 @@ public class Town {
     @JsonIgnore
     @OneToMany(mappedBy = "town")
     private List<Transfer> transfers;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "town")
+    private List<Package> packages;
 }

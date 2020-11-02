@@ -5,6 +5,8 @@ import hu.bme.aut.freelancer_spring.model.enums.Status;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter @Setter
 public class PackageDto {
 
@@ -29,4 +31,8 @@ public class PackageDto {
     private Long senderId;
 
     private Long transferId;
+
+    private Date dateLimit;
+
+    private Long townId;
 }

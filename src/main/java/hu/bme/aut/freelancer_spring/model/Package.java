@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -43,8 +44,20 @@ public class Package {
     @Column(name = "to_long")
     private double toLong;
 
+    @Column(name = "date_limit")
+    @Temporal(TemporalType.DATE)
+    private Date dateLimit;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @ManyToOne
+    @JoinColumn(name = "town_id", referencedColumnName = "id")
+    private Town town;
 
     @ManyToOne
     @JoinColumn(name = "sender_id", referencedColumnName = "id")
@@ -56,6 +69,7 @@ public class Package {
 
     public Package() {
         status = Status.WAITING;
+        createdAt = new Date();
     }
 
     public void setStatus(Status status) {
