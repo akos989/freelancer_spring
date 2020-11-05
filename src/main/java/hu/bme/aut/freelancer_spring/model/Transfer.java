@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,21 +45,29 @@ public class Transfer {
 
     @JsonIgnore
     @OneToMany(mappedBy = "transfer")
-    private List<Package> packages;
+    private List<Package> packages = new ArrayList<>();
 
-    public boolean fitPackage(Package pack) {
-        if (date.before(pack.getDateLimit())) {
-            var weightSum = packages.stream()
-                    .mapToDouble(Package::getWeight)
-                    .sum();
-            boolean weightFit = weightSum + pack.getWeight() <= vehicle.getWeightLimit();
-            var packageCCSum = packages.stream()
-                    .mapToInt(p -> p.getSize().getCC())
-                    .sum();
-            boolean ccFit = packageCCSum + pack.getSize().getCC() <= vehicle.getCC();
-
-            return weightFit && ccFit;
+    public boolean fitPackage(Package newPackage) {
+        if (date.before(newPackage.getDateLimit())) {
+            return vehicle.isBelowWeightLimit(getPackagesWeightSum() + newPackage.getWeight())
+                    && vehicle.isBelowCCLimit(getPackagesCCSum() + newPackage.getSize().getCC());
         }
         return false;
+    }
+
+    private double getPackagesWeightSum() {
+        return packages.stream()
+                .mapToDouble(Package::getWeight)
+                .sum();
+    }
+
+    private int getPackagesCCSum() {
+        return packages.stream()
+                .mapToInt(p -> p.getSize().getCC())
+                .sum();
+    }
+
+    public void addPackage(Package pack) {
+        packages.add(pack);
     }
 }

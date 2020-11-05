@@ -1,11 +1,10 @@
 package hu.bme.aut.freelancer_spring.service;
 
 import hu.bme.aut.freelancer_spring.dto.TransferDto;
+import hu.bme.aut.freelancer_spring.model.Package;
+import hu.bme.aut.freelancer_spring.model.Town;
 import hu.bme.aut.freelancer_spring.model.Transfer;
-import hu.bme.aut.freelancer_spring.repository.TownRepository;
-import hu.bme.aut.freelancer_spring.repository.TransferRepository;
-import hu.bme.aut.freelancer_spring.repository.UserRepository;
-import hu.bme.aut.freelancer_spring.repository.VehicleRepository;
+import hu.bme.aut.freelancer_spring.repository.*;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -20,6 +19,7 @@ public class TransferServiceImp implements TransferService {
     private final UserRepository userRepository;
     private final TownRepository townRepository;
     private final VehicleRepository vehicleRepository;
+    private final PackageRepository packageRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
     @Override
@@ -35,10 +35,14 @@ public class TransferServiceImp implements TransferService {
 
         if (carrier.isPresent() && town.isPresent() && vehicle.isPresent()) {
             if (!carrier.get().getId().equals(vehicle.get().getOwner().getId())) {
-                throw new IllegalArgumentException("Car owner has to be the carrier!");
+                throw new IllegalArgumentException("Car has to be the carrier!");
             }
             var transfer = modelMapper.map(transferDto, Transfer.class);
+            transfer.setCarrier(carrier.get());
+            transfer.setVehicle(vehicle.get());
+            transfer.setTown(town.get());
             transferRepository.save(transfer);
+            storePackages(transfer, findPackages(transfer));
             return transfer.getId();
         }
         return null;
@@ -52,5 +56,18 @@ public class TransferServiceImp implements TransferService {
         return true;
         }
         return false;
+    }
+
+    private List<Package> findPackages(Transfer transfer) {
+        return packageRepository.findByTransferIsNullAndTownAndDateLimitAfterOrderByCreatedAt(transfer.getTown(), transfer.getCreatedAt());
+    }
+    private void storePackages(Transfer transfer, List<Package> packages) {
+        packages.forEach(pack -> {
+            if (transfer.fitPackage(pack)) {
+                transfer.addPackage(pack);
+                pack.setTransfer(transfer);
+                packageRepository.save(pack);
+            }
+        });
     }
 }
