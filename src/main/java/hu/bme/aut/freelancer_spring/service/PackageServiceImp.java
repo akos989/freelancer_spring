@@ -2,6 +2,7 @@ package hu.bme.aut.freelancer_spring.service;
 
 import hu.bme.aut.freelancer_spring.dto.PackageDto;
 import hu.bme.aut.freelancer_spring.model.Package;
+import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.repository.PackageRepository;
 import hu.bme.aut.freelancer_spring.repository.TransferRepository;
 import hu.bme.aut.freelancer_spring.repository.UserRepository;
@@ -10,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -27,10 +29,10 @@ public class PackageServiceImp implements PackageService {
 
     @Override
     public Long save(PackageDto packageDto) {
-        var user = userRepository.findById(packageDto.getSenderId());
-        if (user.isPresent()) {
+        var sender = userRepository.findById(packageDto.getSenderId());
+        if (sender.isPresent()) {
             Package pack = modelMapper.map(packageDto, Package.class);
-            findTransfer(pack);
+            findTransfer(pack).ifPresent(pack::setTransfer);
             packageRepository.save(pack);
             return pack.getId();
         } else {
@@ -57,14 +59,12 @@ public class PackageServiceImp implements PackageService {
         return false;
     }
 
-    private void findTransfer(Package pack) {
+    private Optional<Transfer> findTransfer(Package pack) {
         var transfers =
                 transferRepository.findAllByTownAndDateAfterOrderByDateAscCreatedAtAsc(pack.getTown(), pack.getCreatedAt());
 
-        var transfer = transfers.stream()
-                .filter(tran -> tran.fitPackage(pack))
+        return transfers.stream()
+                .filter(t -> t.fitPackage(pack))
                 .findFirst();
-
-        transfer.ifPresent(pack::setTransfer);
     }
 }

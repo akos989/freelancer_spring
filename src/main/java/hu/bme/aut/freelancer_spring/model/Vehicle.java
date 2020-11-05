@@ -47,4 +47,13 @@ public class Vehicle {
     public int getCC() {
         return x * y * z;
     }
+
+    public boolean isBelowWeightLimit(double weight) {
+        return weight <= weightLimit;
+    }
+
+    public boolean isBelowCCLimit(int cc) {
+        return cc <= getCC();
+    }
+
 }
