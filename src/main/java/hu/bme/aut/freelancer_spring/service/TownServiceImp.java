@@ -1,6 +1,9 @@
 package hu.bme.aut.freelancer_spring.service;
 
+import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Town;
+import hu.bme.aut.freelancer_spring.model.Transfer;
+import hu.bme.aut.freelancer_spring.model.Vehicle;
 import hu.bme.aut.freelancer_spring.repository.TownRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,5 +39,17 @@ public class TownServiceImp implements TownService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<Package> getPackages(Long id) {
+        var town = townRepository.findById(id);
+        return town.map(Town::getPackages).orElse(null);
+    }
+
+    @Override
+    public List<Transfer> getTransfers(Long id) {
+        var town = townRepository.findById(id);
+        return town.map(Town::getTransfers).orElse(null);
     }
 }

@@ -5,6 +5,7 @@ import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.model.User;
 import hu.bme.aut.freelancer_spring.model.Vehicle;
 import hu.bme.aut.freelancer_spring.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,10 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<Long> save(@RequestBody User user) {
-        return ResponseEntity.ok(userService.save(user));
+        var id = userService.save(user);
+        if (id != null)
+            return ResponseEntity.ok(id);
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     @DeleteMapping("/{id}")

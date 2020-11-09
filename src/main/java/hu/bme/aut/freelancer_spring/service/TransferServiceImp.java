@@ -58,6 +58,12 @@ public class TransferServiceImp implements TransferService {
         return false;
     }
 
+    @Override
+    public List<Package> getPackages(Long id) {
+        var transfer = transferRepository.findById(id);
+        return transfer.map(Transfer::getPackages).orElse(null);
+    }
+
     private List<Package> findPackages(Transfer transfer) {
         return packageRepository.findByTransferIsNullAndTownAndDateLimitAfterOrderByCreatedAt(transfer.getTown(), transfer.getCreatedAt());
     }

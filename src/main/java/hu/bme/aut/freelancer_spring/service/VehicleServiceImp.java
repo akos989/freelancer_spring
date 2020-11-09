@@ -1,6 +1,7 @@
 package hu.bme.aut.freelancer_spring.service;
 
 import hu.bme.aut.freelancer_spring.dto.VehicleDto;
+import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.model.Vehicle;
 import hu.bme.aut.freelancer_spring.repository.UserRepository;
 import hu.bme.aut.freelancer_spring.repository.VehicleRepository;
@@ -42,5 +43,11 @@ public class VehicleServiceImp implements VehicleService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<Transfer> getTransfers(Long id) {
+        var vehicle = vehicleRepository.findById(id);
+        return vehicle.map(Vehicle::getTransfers).orElse(null);
     }
 }

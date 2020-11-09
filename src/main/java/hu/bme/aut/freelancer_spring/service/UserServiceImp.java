@@ -29,6 +29,9 @@ public class UserServiceImp implements UserService {
 
     @Override
     public Long save(User user) {
+        var existingUser = userRepository.findByEmail(user.getEmail());
+        if (existingUser.isPresent())
+            return null;
         userRepository.save(user);
         return user.getId();
     }
