@@ -1,5 +1,6 @@
 package hu.bme.aut.freelancer_spring.controller;
 
+import hu.bme.aut.freelancer_spring.dto.UserRegistrationDto;
 import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.model.User;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -36,8 +38,9 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> save(@RequestBody User user) {
-        var id = userService.save(user);
+    public ResponseEntity<Long> save(
+            @RequestBody @Valid UserRegistrationDto userRegistrationDto) {
+        var id = userService.save(userRegistrationDto);
         if (id != null)
             return ResponseEntity.ok(id);
         return new ResponseEntity<>(HttpStatus.CONFLICT);

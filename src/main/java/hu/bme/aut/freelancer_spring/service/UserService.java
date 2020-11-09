@@ -1,5 +1,6 @@
 package hu.bme.aut.freelancer_spring.service;
 
+import hu.bme.aut.freelancer_spring.dto.UserRegistrationDto;
 import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.model.User;
@@ -13,7 +14,7 @@ public interface UserService {
 
     User findById(Long id);
 
-    Long save(User user);
+    Long save(UserRegistrationDto userRegistrationDto);
 
     boolean delete(Long id);
 

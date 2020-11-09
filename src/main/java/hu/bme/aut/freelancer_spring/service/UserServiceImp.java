@@ -1,11 +1,14 @@
 package hu.bme.aut.freelancer_spring.service;
 
+import hu.bme.aut.freelancer_spring.dto.UserRegistrationDto;
 import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.model.User;
 import hu.bme.aut.freelancer_spring.model.Vehicle;
 import hu.bme.aut.freelancer_spring.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +18,8 @@ import java.util.List;
 public class UserServiceImp implements UserService {
 
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper = new ModelMapper();
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<User> findAll() {
@@ -28,10 +33,13 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public Long save(User user) {
-        var existingUser = userRepository.findByEmail(user.getEmail());
+    public Long save(UserRegistrationDto userRegistrationDto) {
+        var existingUser = userRepository.findByEmail(userRegistrationDto.getEmail());
         if (existingUser.isPresent())
             return null;
+        var user = modelMapper.map(userRegistrationDto, User.class);
+
+        user.setPassword(passwordEncoder.encode(userRegistrationDto.getPassword()));
         userRepository.save(user);
         return user.getId();
     }

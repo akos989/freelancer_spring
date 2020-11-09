@@ -32,7 +32,6 @@ public class User {
     @Column(name = "phonenumber")
     private String phonenumber;
 
-    @Getter(AccessLevel.NONE)
     @Column(name = "password")
     private String password;
 
