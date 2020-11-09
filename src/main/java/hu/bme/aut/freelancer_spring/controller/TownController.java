@@ -1,6 +1,8 @@
 package hu.bme.aut.freelancer_spring.controller;
 
+import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Town;
+import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.service.TownService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,24 @@ public class TownController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/transfers/{id}")
+    public ResponseEntity<List<Transfer>> getTransfers(@PathVariable Long id) {
+        var transfers = townService.getTransfers(id);
+        if (transfers != null) {
+            return ResponseEntity.ok(transfers);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/packages/{id}")
+    public ResponseEntity<List<Package>> getPackages(@PathVariable Long id) {
+        var packages = townService.getPackages(id);
+        if (packages != null) {
+            return ResponseEntity.ok(packages);
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }

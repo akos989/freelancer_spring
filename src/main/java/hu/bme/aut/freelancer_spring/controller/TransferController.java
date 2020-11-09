@@ -1,6 +1,7 @@
 package hu.bme.aut.freelancer_spring.controller;
 
 import hu.bme.aut.freelancer_spring.dto.TransferDto;
+import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.service.TransferService;
 import lombok.AllArgsConstructor;
@@ -44,5 +45,14 @@ public class TransferController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/packages/{id}")
+    ResponseEntity<List<Package>> getTransfers(@PathVariable Long id) {
+        var packages = transferService.getPackages(id);
+        if (packages != null) {
+            return ResponseEntity.ok(packages);
+        }
+        return ResponseEntity.notFound().build();
     }
 }
