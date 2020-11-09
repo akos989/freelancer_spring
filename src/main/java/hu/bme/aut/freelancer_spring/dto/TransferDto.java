@@ -16,4 +16,6 @@ public class TransferDto {
     private Long vehicleId;
 
     private Long carrierId;
+
+    private boolean hasInsurance;
 }

@@ -31,6 +31,9 @@ public class Transfer {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt = new Date();
 
+    @Column(name = "has_insurance")
+    private boolean hasInsurance = false;
+
     @ManyToOne
     @JoinColumn(name = "carrier_id", referencedColumnName = "id")
     private User carrier;
@@ -48,11 +51,15 @@ public class Transfer {
     private List<Package> packages = new ArrayList<>();
 
     public boolean fitPackage(Package newPackage) {
-        if (date.before(newPackage.getDateLimit())) {
+        if (date.before(newPackage.getDateLimit()) && suitableInsurance(newPackage)) {
             return vehicle.isBelowWeightLimit(getPackagesWeightSum() + newPackage.getWeight())
                     && vehicle.isBelowCCLimit(getPackagesCCSum() + newPackage.getSize().getCC());
         }
         return false;
+    }
+
+    private boolean suitableInsurance(Package newPackage) {
+        return !newPackage.needInsurance() || hasInsurance;
     }
 
     private double getPackagesWeightSum() {

@@ -1,7 +1,9 @@
 package hu.bme.aut.freelancer_spring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import hu.bme.aut.freelancer_spring.model.enums.Size;
 import hu.bme.aut.freelancer_spring.model.enums.Status;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +15,10 @@ import java.util.Objects;
 @Table(name = "package_entity")
 @Getter @Setter
 public class Package {
+
+    @JsonIgnore
+    @Setter(AccessLevel.NONE)
+    private static final int NO_INSURANCE_LIMIT = 30000;
 
     @Id
     @GeneratedValue(generator = "package_id_seq", strategy = GenerationType.SEQUENCE)
@@ -44,6 +50,9 @@ public class Package {
     @Column(name = "to_long")
     private double toLong;
 
+    @Column(name = "value")
+    private int value;
+
     @Column(name = "date_limit")
     @Temporal(TemporalType.DATE)
     private Date dateLimit;
@@ -74,5 +83,9 @@ public class Package {
 
     public void setStatus(Status status) {
         this.status = Objects.requireNonNullElse(status, Status.WAITING);
+    }
+
+    public boolean needInsurance() {
+        return value > NO_INSURANCE_LIMIT;
     }
 }
