@@ -3,6 +3,7 @@ package hu.bme.aut.freelancer_spring.service;
 import hu.bme.aut.freelancer_spring.dto.PackageDto;
 import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Transfer;
+import hu.bme.aut.freelancer_spring.model.enums.Status;
 import hu.bme.aut.freelancer_spring.repository.PackageRepository;
 import hu.bme.aut.freelancer_spring.repository.TransferRepository;
 import hu.bme.aut.freelancer_spring.repository.UserRepository;
@@ -57,6 +58,19 @@ public class PackageServiceImp implements PackageService {
 //        var p = packageRepository.findById(packageId);
 //        p.
         return false;
+    }
+
+    @Override
+    public boolean changeStatus(Long packageId, Status status) {
+        var pack = packageRepository.findById(packageId);
+        if (pack.isPresent()) {
+            var p = pack.get();
+            p.setStatus(status);
+            packageRepository.save(p);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private Optional<Transfer> findTransfer(Package pack) {
