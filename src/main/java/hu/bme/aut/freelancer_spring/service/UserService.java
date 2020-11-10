@@ -1,5 +1,6 @@
 package hu.bme.aut.freelancer_spring.service;
 
+import hu.bme.aut.freelancer_spring.dto.JwtDto;
 import hu.bme.aut.freelancer_spring.dto.UserLoginDto;
 import hu.bme.aut.freelancer_spring.dto.UserRegistrationDto;
 import hu.bme.aut.freelancer_spring.model.Package;
@@ -17,7 +18,7 @@ public interface UserService {
 
     Long save(UserRegistrationDto userRegistrationDto);
 
-    String login(UserLoginDto userLoginDto);
+    JwtDto login(UserLoginDto userLoginDto);
 
     boolean delete(Long id);
 

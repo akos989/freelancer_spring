@@ -1,5 +1,6 @@
 package hu.bme.aut.freelancer_spring.service;
 
+import hu.bme.aut.freelancer_spring.dto.JwtDto;
 import hu.bme.aut.freelancer_spring.dto.UserLoginDto;
 import hu.bme.aut.freelancer_spring.dto.UserRegistrationDto;
 import hu.bme.aut.freelancer_spring.model.Package;
@@ -55,7 +56,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public String login(UserLoginDto userLoginDto) {
+    public JwtDto login(UserLoginDto userLoginDto) {
         try {
             authenticationManager.authenticate(
               new UsernamePasswordAuthenticationToken(userLoginDto.getEmail(), userLoginDto.getPassword())
@@ -64,7 +65,7 @@ public class UserServiceImp implements UserService {
             return null;
         }
         final UserDetails userDetails = myUserDetailsService.loadUserByUsername(userLoginDto.getEmail());
-        return jwtUtils.generateToken(userDetails);
+        return new JwtDto(jwtUtils.generateToken(userDetails), jwtUtils.getExpiresIn());
     }
 
     @Override

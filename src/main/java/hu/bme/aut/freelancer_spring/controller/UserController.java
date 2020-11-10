@@ -1,5 +1,6 @@
 package hu.bme.aut.freelancer_spring.controller;
 
+import hu.bme.aut.freelancer_spring.dto.JwtDto;
 import hu.bme.aut.freelancer_spring.dto.UserLoginDto;
 import hu.bme.aut.freelancer_spring.dto.UserRegistrationDto;
 import hu.bme.aut.freelancer_spring.model.Package;
@@ -48,7 +49,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid UserLoginDto userLoginDto) {
+    public ResponseEntity<JwtDto> login(@RequestBody @Valid UserLoginDto userLoginDto) {
         return ResponseEntity.ok(userService.login(userLoginDto));
     }
 

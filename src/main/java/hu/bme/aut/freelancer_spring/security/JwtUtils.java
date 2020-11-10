@@ -3,6 +3,7 @@ package hu.bme.aut.freelancer_spring.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.Getter;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,8 @@ import java.util.function.Function;
 public class JwtUtils {
 
     private final String SECRET_KEY = "secret";
+    @Getter
+    private final int expiresIn = 1000 * 60 * 60 * 10;
 
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -47,7 +50,7 @@ public class JwtUtils {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .setExpiration(new Date(System.currentTimeMillis() + expiresIn))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
