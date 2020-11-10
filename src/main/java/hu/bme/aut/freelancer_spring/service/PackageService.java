@@ -14,7 +14,5 @@ public interface PackageService {
 
     boolean delete(Long id);
 
-    boolean updateTransferId(Long packageId, Long transferId);
-
     boolean changeStatus(Long packageId, Status status);
 }

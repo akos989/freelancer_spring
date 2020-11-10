@@ -12,12 +12,14 @@ import hu.bme.aut.freelancer_spring.security.JwtUtils;
 import hu.bme.aut.freelancer_spring.security.MyUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -40,14 +42,17 @@ public class UserServiceImp implements UserService {
     @Override
     public User findById(Long id) {
         var user = userRepository.findById(id);
-        return user.orElse(null);
+        if (user.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User was not found with id: " + id);
+        return user.get();
     }
 
     @Override
     public Long save(UserRegistrationDto userRegistrationDto) {
         var existingUser = userRepository.findByEmail(userRegistrationDto.getEmail());
         if (existingUser.isPresent())
-            return null;
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "User already exists with email: " + userRegistrationDto.getEmail());
 
         var user = modelMapper.map(userRegistrationDto, User.class);
         user.setPassword(passwordEncoder.encode(userRegistrationDto.getPassword()));
@@ -62,7 +67,7 @@ public class UserServiceImp implements UserService {
               new UsernamePasswordAuthenticationToken(userLoginDto.getEmail(), userLoginDto.getPassword())
             );
         } catch (BadCredentialsException e) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad login credentials");
         }
         final UserDetails userDetails = myUserDetailsService.loadUserByUsername(userLoginDto.getEmail());
         return new JwtDto(jwtUtils.generateToken(userDetails), jwtUtils.getExpiresIn());
@@ -71,40 +76,46 @@ public class UserServiceImp implements UserService {
     @Override
     public boolean delete(Long id) {
         var user = userRepository.findById(id);
-        if (user.isPresent()) {
-            userRepository.delete(user.get());
-            return true;
+        if (user.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User was not found with id: " + id);
         }
-        return false;
+        userRepository.delete(user.get());
+        return true;
     }
 
     @Override
     public boolean changeInsurance(Long id, boolean newInsurance) {
         var user = userRepository.findById(id);
-        if (user.isPresent()) {
-            var u = user.get();
-            u.setHasInsurance(newInsurance);
-            userRepository.save(u);
-            return true;
+        if (user.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User was not found with id: " + id);
         }
-        return false;
+        var u = user.get();
+        u.setHasInsurance(newInsurance);
+        userRepository.save(u);
+        return true;
     }
 
     @Override
     public List<Package> getPackages(Long id) {
         var user = userRepository.findById(id);
-        return user.map(User::getPackages).orElse(null);
+        if (user.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User was not found with id: " + id);
+        return user.get().getPackages();
     }
 
     @Override
     public List<Transfer> getTransfers(Long id) {
         var user = userRepository.findById(id);
-        return user.map(User::getTransfers).orElse(null);
+        if (user.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User was not found with id: " + id);
+        return user.get().getTransfers();
     }
 
     @Override
     public List<Vehicle> getVehicles(Long id) {
         var user = userRepository.findById(id);
-        return user.map(User::getVehicles).orElse(null);
+        if (user.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User was not found with id: " + id);
+        return user.get().getVehicles();
     }
 }

@@ -5,7 +5,6 @@ import hu.bme.aut.freelancer_spring.model.Town;
 import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.service.TownService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,40 +23,22 @@ public class TownController {
     }
 
     @PostMapping
-    public ResponseEntity save(@RequestBody Town town) {
-        var exists = townService.save(town);
-        if (exists == -1L) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
-        return ResponseEntity.ok(exists);
+    public ResponseEntity<Long> save(@RequestBody Town town) {
+        return ResponseEntity.ok(townService.save(town));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable Long id) {
-        var isDeleted = townService.delete(id);
-        if (isDeleted) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
+        return ResponseEntity.ok(townService.delete(id));
     }
 
     @GetMapping("/transfers/{id}")
     public ResponseEntity<List<Transfer>> getTransfers(@PathVariable Long id) {
-        var transfers = townService.getTransfers(id);
-        if (transfers != null) {
-            return ResponseEntity.ok(transfers);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(townService.getTransfers(id));
     }
 
     @GetMapping("/packages/{id}")
     public ResponseEntity<List<Package>> getPackages(@PathVariable Long id) {
-        var packages = townService.getPackages(id);
-        if (packages != null) {
-            return ResponseEntity.ok(packages);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(townService.getPackages(id));
     }
-
 }

@@ -24,42 +24,16 @@ public class PackageController {
 
     @PostMapping
     public ResponseEntity<Long> save(@RequestBody PackageDto packageDto) {
-        Long id = packageService.save(packageDto);
-        if (id != null) {
-            return ResponseEntity.ok(id);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(packageService.save(packageDto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable Long id) {
-        var isDeleted = packageService.delete(id);
-        if (isDeleted) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @PutMapping("update_transfer/{id}")
-    public ResponseEntity updateTransferId(@PathVariable Long id, @RequestBody Long transferId) {
-        var isUpdated = packageService.updateTransferId(id, transferId);
-        if (isUpdated) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(packageService.delete(id));
     }
 
     @PutMapping("changeStatus/{id}")
-    public ResponseEntity<Long> changeStatus(@PathVariable Long id, @RequestParam("status") Status status) {
-        System.out.println(status);
-        var isUpdated = packageService.changeStatus(id, status);
-        if (isUpdated) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Boolean> changeStatus(@PathVariable Long id, @RequestParam("status") Status status) {
+        return ResponseEntity.ok(packageService.changeStatus(id, status));
     }
 }
