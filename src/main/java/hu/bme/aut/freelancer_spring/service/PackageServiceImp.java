@@ -5,6 +5,7 @@ import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.model.enums.Status;
 import hu.bme.aut.freelancer_spring.repository.PackageRepository;
+import hu.bme.aut.freelancer_spring.repository.TownRepository;
 import hu.bme.aut.freelancer_spring.repository.TransferRepository;
 import hu.bme.aut.freelancer_spring.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ public class PackageServiceImp implements PackageService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper = new ModelMapper();
     private final TransferRepository transferRepository;
+    private final TownRepository townRepository;
 
     @Override
     public List<Package> findAll() {
@@ -33,8 +35,11 @@ public class PackageServiceImp implements PackageService {
     @Override
     public Long save(PackageDto packageDto) {
         var sender = userRepository.findById(packageDto.getSenderId());
+        var town = townRepository.findById(packageDto.getTownId());
         if (sender.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender was not found with id: " + packageDto.getSenderId());
+        if (town.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Town was not found with id: " + packageDto.getTownId());
 
         Package pack = modelMapper.map(packageDto, Package.class);
         findTransfer(pack).ifPresent(pack::setTransfer);
