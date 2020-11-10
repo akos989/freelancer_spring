@@ -79,6 +79,18 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
+    public boolean changeInsurance(Long id, boolean newInsurance) {
+        var user = userRepository.findById(id);
+        if (user.isPresent()) {
+            var u = user.get();
+            u.setHasInsurance(newInsurance);
+            userRepository.save(u);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public List<Package> getPackages(Long id) {
         var user = userRepository.findById(id);
         return user.map(User::getPackages).orElse(null);

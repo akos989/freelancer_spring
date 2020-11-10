@@ -31,9 +31,6 @@ public class Transfer {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt = new Date();
 
-    @Column(name = "has_insurance")
-    private boolean hasInsurance = false;
-
     @ManyToOne
     @JoinColumn(name = "carrier_id", referencedColumnName = "id")
     private User carrier;
@@ -59,7 +56,7 @@ public class Transfer {
     }
 
     private boolean suitableInsurance(Package newPackage) {
-        return !newPackage.needInsurance() || hasInsurance;
+        return !newPackage.needInsurance() || carrier.isHasInsurance();
     }
 
     private double getPackagesWeightSum() {

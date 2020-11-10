@@ -13,4 +13,5 @@ public class UserDto {
 
     private String phonenumber;
 
+    private boolean hasInsurance;
 }

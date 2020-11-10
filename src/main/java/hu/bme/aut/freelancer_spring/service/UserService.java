@@ -22,6 +22,8 @@ public interface UserService {
 
     boolean delete(Long id);
 
+    boolean changeInsurance(Long id, boolean newInsurance);
+
     List<Package> getPackages(Long id);
 
     List<Transfer> getTransfers(Long id);

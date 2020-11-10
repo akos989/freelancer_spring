@@ -63,6 +63,16 @@ public class UserController {
         }
     }
 
+    @PutMapping("changeInsurance/{id}")
+    public ResponseEntity changeInsurance(@PathVariable Long id, @RequestParam boolean insurance) {
+        var updated = userService.changeInsurance(id, insurance);
+        if (updated) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("/packages/{id}")
     public ResponseEntity<List<Package>> getPackages(@PathVariable Long id) {
         var packages = userService.getPackages(id);
