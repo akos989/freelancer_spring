@@ -33,4 +33,6 @@ public class UserRegistrationDto {
     @NotNull
     @NotEmpty
     private String phonenumber;
+
+    private boolean hasInsurance;
 }
