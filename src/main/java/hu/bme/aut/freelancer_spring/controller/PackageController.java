@@ -2,6 +2,7 @@ package hu.bme.aut.freelancer_spring.controller;
 
 import hu.bme.aut.freelancer_spring.dto.PackageDto;
 import hu.bme.aut.freelancer_spring.model.Package;
+import hu.bme.aut.freelancer_spring.model.enums.Status;
 import hu.bme.aut.freelancer_spring.service.PackageService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,31 +24,16 @@ public class PackageController {
 
     @PostMapping
     public ResponseEntity<Long> save(@RequestBody PackageDto packageDto) {
-        Long id = packageService.save(packageDto);
-        if (id != null) {
-            return ResponseEntity.ok(id);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(packageService.save(packageDto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable Long id) {
-        var isDeleted = packageService.delete(id);
-        if (isDeleted) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(packageService.delete(id));
     }
 
-    @PutMapping("update_transfer/{id}")
-    public ResponseEntity updateTransferId(@PathVariable Long id, @RequestBody Long transferId) {
-        var isUpdated = packageService.updateTransferId(id, transferId);
-        if (isUpdated) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @PutMapping("changeStatus/{id}")
+    public ResponseEntity<Boolean> changeStatus(@PathVariable Long id, @RequestParam("status") Status status) {
+        return ResponseEntity.ok(packageService.changeStatus(id, status));
     }
 }

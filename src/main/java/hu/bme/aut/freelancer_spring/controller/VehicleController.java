@@ -24,29 +24,16 @@ public class VehicleController {
 
     @PostMapping
     ResponseEntity<Long> save(@RequestBody VehicleDto vehicleDto) {
-        Long id = vehicleService.save(vehicleDto);
-        if (id != null) {
-            return ResponseEntity.ok(id);
-        }
-        return ResponseEntity.notFound().build();
+       return ResponseEntity.ok(vehicleService.save(vehicleDto));
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity delete(@PathVariable Long id) {
-        var isDeleted = vehicleService.delete(id);
-        if (isDeleted) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    ResponseEntity<Boolean> delete(@PathVariable Long id) {
+        return ResponseEntity.ok(vehicleService.delete(id));
     }
 
     @GetMapping("/transfers/{id}")
     ResponseEntity<List<Transfer>> getTransfers(@PathVariable Long id) {
-        var transfers = vehicleService.getTransfers(id);
-        if (transfers != null) {
-            return ResponseEntity.ok(transfers);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(vehicleService.getTransfers(id));
     }
 }

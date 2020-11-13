@@ -1,7 +1,6 @@
 package hu.bme.aut.freelancer_spring.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,9 +31,11 @@ public class User {
     @Column(name = "phonenumber")
     private String phonenumber;
 
-    @Getter(AccessLevel.NONE)
     @Column(name = "password")
     private String password;
+
+    @Column(name = "has_insurance")
+    private boolean hasInsurance = false;
 
     @JsonIgnore
     @OneToMany(mappedBy = "sender")

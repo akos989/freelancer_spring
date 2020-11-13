@@ -3,10 +3,11 @@ package hu.bme.aut.freelancer_spring.service;
 import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Town;
 import hu.bme.aut.freelancer_spring.model.Transfer;
-import hu.bme.aut.freelancer_spring.model.Vehicle;
 import hu.bme.aut.freelancer_spring.repository.TownRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -24,32 +25,38 @@ public class TownServiceImp implements TownService {
     @Override
     public Long save(Town town) {
         var exists = townRepository.findByName(town.getName());
-        if (exists.isEmpty()) {
-            townRepository.save(town);
-            return town.getId();
+        if (exists.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Town already exists with name: " + town.getName());
         }
-        return -1L;
+        townRepository.save(town);
+        return town.getId();
     }
 
     @Override
     public boolean delete(Long id) {
         var town = townRepository.findById(id);
-        if (town.isPresent()) {
-            townRepository.delete(town.get());
-            return true;
+        if (town.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Town not found with id: " + id);
         }
-        return false;
+        townRepository.delete(town.get());
+        return true;
     }
 
     @Override
     public List<Package> getPackages(Long id) {
         var town = townRepository.findById(id);
-        return town.map(Town::getPackages).orElse(null);
+        if (town.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Town not found with id: " + id);
+        }
+        return town.get().getPackages();
     }
 
     @Override
     public List<Transfer> getTransfers(Long id) {
         var town = townRepository.findById(id);
-        return town.map(Town::getTransfers).orElse(null);
+        if (town.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Town not found with id: " + id);
+        }
+        return town.get().getTransfers();
     }
 }

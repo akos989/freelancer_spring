@@ -7,7 +7,9 @@ import hu.bme.aut.freelancer_spring.repository.UserRepository;
 import hu.bme.aut.freelancer_spring.repository.VehicleRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -27,27 +29,30 @@ public class VehicleServiceImp implements VehicleService {
     @Override
     public Long save(VehicleDto vehicleDto) {
         var owner = userRepository.findById(vehicleDto.getOwnerId());
-        if (owner.isPresent()) {
-            Vehicle vehicle = modelMapper.map(vehicleDto, Vehicle.class);
-            vehicleRepository.save(vehicle);
-            return vehicle.getId();
+        if (owner.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Owner user not found with id: " + vehicleDto.getOwnerId());
         }
-        return null;
+        Vehicle vehicle = modelMapper.map(vehicleDto, Vehicle.class);
+        vehicleRepository.save(vehicle);
+        return vehicle.getId();
     }
 
     @Override
     public boolean delete(Long id) {
         var vehicle = vehicleRepository.findById(id);
-        if (vehicle.isPresent()) {
-            vehicleRepository.delete(vehicle.get());
-            return true;
+        if (vehicle.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found with id: " + id);
         }
-        return false;
+        vehicleRepository.delete(vehicle.get());
+        return true;
     }
 
     @Override
     public List<Transfer> getTransfers(Long id) {
         var vehicle = vehicleRepository.findById(id);
-        return vehicle.map(Vehicle::getTransfers).orElse(null);
+        if (vehicle.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found with id: " + id);
+        }
+        return vehicle.get().getTransfers();
     }
 }

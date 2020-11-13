@@ -35,4 +35,6 @@ public class PackageDto {
     private Date dateLimit;
 
     private Long townId;
+
+    private int value;
 }

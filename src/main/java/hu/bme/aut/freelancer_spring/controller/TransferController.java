@@ -25,34 +25,16 @@ public class TransferController {
 
     @PostMapping
     ResponseEntity<Long> save(@RequestBody TransferDto transferDto) {
-        try {
-            var id = transferService.save(transferDto);
-            if (id != null) {
-                return ResponseEntity.ok(id);
-            }
-            return ResponseEntity.notFound().build();
-        }
-        catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
+        return ResponseEntity.ok(transferService.save(transferDto));
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity delete(@PathVariable Long id) {
-        var isDeleted = transferService.delete(id);
-        if (isDeleted) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    ResponseEntity<Boolean> delete(@PathVariable Long id) {
+        return ResponseEntity.ok(transferService.delete(id));
     }
 
     @GetMapping("/packages/{id}")
     ResponseEntity<List<Package>> getTransfers(@PathVariable Long id) {
-        var packages = transferService.getPackages(id);
-        if (packages != null) {
-            return ResponseEntity.ok(packages);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(transferService.getPackages(id));
     }
 }
