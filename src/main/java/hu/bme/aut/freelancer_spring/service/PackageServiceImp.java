@@ -9,7 +9,9 @@ import hu.bme.aut.freelancer_spring.repository.TransferRepository;
 import hu.bme.aut.freelancer_spring.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,46 +33,35 @@ public class PackageServiceImp implements PackageService {
     @Override
     public Long save(PackageDto packageDto) {
         var sender = userRepository.findById(packageDto.getSenderId());
-        if (sender.isPresent()) {
-            Package pack = modelMapper.map(packageDto, Package.class);
-            findTransfer(pack).ifPresent(pack::setTransfer);
-            packageRepository.save(pack);
-            return pack.getId();
-        } else {
-            return null;
+        if (sender.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found with id: " + packageDto.getSenderId());
         }
+        Package pack = modelMapper.map(packageDto, Package.class);
+        findTransfer(pack).ifPresent(pack::setTransfer);
+        packageRepository.save(pack);
+        return pack.getId();
     }
 
     @Override
     public boolean delete(Long id) {
         var pack = packageRepository.findById(id);
-        if (pack.isPresent()) {
-            packageRepository.delete(pack.get());
-            return true;
-        } else {
-            return false;
+        if (pack.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Package not found with id: " + id);
         }
-    }
-
-    @Override
-    public boolean updateTransferId(Long packageId, Long transferId) {
-        //TODO
-//        var p = packageRepository.findById(packageId);
-//        p.
-        return false;
+        packageRepository.delete(pack.get());
+        return true;
     }
 
     @Override
     public boolean changeStatus(Long packageId, Status status) {
         var pack = packageRepository.findById(packageId);
         if (pack.isPresent()) {
-            var p = pack.get();
-            p.setStatus(status);
-            packageRepository.save(p);
-            return true;
-        } else {
-            return false;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Package not found with id: " + packageId);
         }
+        var p = pack.get();
+        p.setStatus(status);
+        packageRepository.save(p);
+        return true;
     }
 
     private Optional<Transfer> findTransfer(Package pack) {
