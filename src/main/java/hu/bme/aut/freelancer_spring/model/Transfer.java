@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +27,24 @@ public class Transfer {
     @Column(name = "date")
     @Temporal(TemporalType.DATE)
     private Date date;
+
+    @Column(name = "from_lat")
+    private double fromLat;
+
+    @Column(name = "from_long")
+    private double fromLong;
+
+    @Column(name = "to_lat")
+    private double toLat;
+
+    @Column(name = "to_long")
+    private double toLong;
+
+    @Column(name = "start_time")
+    private LocalTime startTime;
+
+    @Column(name = "encoded_route")
+    private String encodedRoute;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
