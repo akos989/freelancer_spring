@@ -10,4 +10,6 @@ import java.util.List;
 public interface TransferRepository extends JpaRepository<Transfer, Long> {
 
     List<Transfer> findAllByTownAndDateAfterOrderByDateAscCreatedAtAsc(Town town, Date createdAt);
+
+    List<Transfer> findAllByDate(Date date);
 }

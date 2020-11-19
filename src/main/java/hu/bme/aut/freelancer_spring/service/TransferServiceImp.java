@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -78,17 +79,20 @@ public class TransferServiceImp implements TransferService {
     }
 
     @Override
-    public List<LatLng> calculateRoute(Long id) {
-        var transferOptional = transferRepository.findById(id);
-        var transfer = transferOptional.get();
+    public List<Transfer> getTransfersOnDate(Date date) {
+        return transferRepository.findAllByDate(date);
+    }
+
+    @Override
+    public void calculateRoute(Transfer transfer) {
+        if (transfer.getPackages().size() == 0)
+            return;
         final var routes = directionService.getRouteForTransfer(transfer);
         transfer.setEncodedRoute(getEncodedRoute(routes));
         transferRepository.save(transfer);
         var time = setPickupTimeForPackages(routes.get(0), transfer.getPackages(), transfer.getStartTime());
         setArriveTimeForPackages(routes.get(1), transfer.getPackages(), time);
         transfer.getPackages().forEach(packageRepository::save);
-
-        return PolylineEncoding.decode(transfer.getEncodedRoute());
     }
 
     private LocalTime setPickupTimeForPackages(DirectionsRoute route, List<Package> packages, LocalTime startTime) {

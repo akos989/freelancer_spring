@@ -1,10 +1,10 @@
 package hu.bme.aut.freelancer_spring.service;
 
-import com.google.maps.model.LatLng;
 import hu.bme.aut.freelancer_spring.dto.TransferDto;
 import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Transfer;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TransferService {
@@ -17,5 +17,7 @@ public interface TransferService {
 
     List<Package> getPackages(Long id);
 
-    List<LatLng> calculateRoute(Long id);
+    List<Transfer> getTransfersOnDate(Date date);
+
+    void calculateRoute(Transfer transfer);
 }
