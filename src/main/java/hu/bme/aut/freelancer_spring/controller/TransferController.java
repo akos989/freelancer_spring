@@ -37,4 +37,10 @@ public class TransferController {
     ResponseEntity<List<Package>> getTransfers(@PathVariable Long id) {
         return ResponseEntity.ok(transferService.getPackages(id));
     }
+
+    @GetMapping("/calculateRoute/{id}")
+    ResponseEntity calculateRoute(@PathVariable Long id) {
+//        transferService.calculateRoute(id);
+        return ResponseEntity.ok(transferService.calculateRoute(id));
+    }
 }

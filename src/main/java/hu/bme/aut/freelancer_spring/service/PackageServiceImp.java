@@ -2,9 +2,11 @@ package hu.bme.aut.freelancer_spring.service;
 
 import hu.bme.aut.freelancer_spring.dto.PackageDto;
 import hu.bme.aut.freelancer_spring.model.Package;
+import hu.bme.aut.freelancer_spring.model.Town;
 import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.model.enums.Status;
 import hu.bme.aut.freelancer_spring.repository.PackageRepository;
+import hu.bme.aut.freelancer_spring.repository.TownRepository;
 import hu.bme.aut.freelancer_spring.repository.TransferRepository;
 import hu.bme.aut.freelancer_spring.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,7 @@ public class PackageServiceImp implements PackageService {
 
     private final PackageRepository packageRepository;
     private final UserRepository userRepository;
+    private final TownRepository townRepository;
     private final ModelMapper modelMapper = new ModelMapper();
     private final TransferRepository transferRepository;
 
@@ -33,10 +36,15 @@ public class PackageServiceImp implements PackageService {
     @Override
     public Long save(PackageDto packageDto) {
         var sender = userRepository.findById(packageDto.getSenderId());
+        var town = townRepository.findById(packageDto.getTownId());
         if (sender.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found with id: " + packageDto.getSenderId());
         }
+        if (town.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Town not found with id: " + packageDto.getTownId());
+        }
         Package pack = modelMapper.map(packageDto, Package.class);
+        pack.setTown(town.get());
         findTransfer(pack).ifPresent(pack::setTransfer);
         packageRepository.save(pack);
         return pack.getId();
@@ -65,9 +73,10 @@ public class PackageServiceImp implements PackageService {
     }
 
     private Optional<Transfer> findTransfer(Package pack) {
+        var town = pack.getTown();
+        var createdAT = pack.getCreatedAt();
         var transfers =
                 transferRepository.findAllByTownAndDateAfterOrderByDateAscCreatedAtAsc(pack.getTown(), pack.getCreatedAt());
-
         return transfers.stream()
                 .filter(t -> t.fitPackage(pack))
                 .findFirst();

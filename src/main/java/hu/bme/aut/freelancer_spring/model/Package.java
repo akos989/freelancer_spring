@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.Objects;
 
@@ -56,6 +57,12 @@ public class Package {
     @Column(name = "date_limit")
     @Temporal(TemporalType.DATE)
     private Date dateLimit;
+
+    @Column(name = "arrive_time")
+    private LocalTime arriveTime;
+
+    @Column(name = "pickup_time")
+    private LocalTime pickupTime;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

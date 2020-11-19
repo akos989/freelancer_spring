@@ -1,8 +1,10 @@
 package hu.bme.aut.freelancer_spring.service;
 
+import com.google.maps.internal.PolylineEncoding;
+import com.google.maps.model.DirectionsRoute;
+import com.google.maps.model.LatLng;
 import hu.bme.aut.freelancer_spring.dto.TransferDto;
 import hu.bme.aut.freelancer_spring.model.Package;
-import hu.bme.aut.freelancer_spring.model.Town;
 import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.repository.*;
 import lombok.AllArgsConstructor;
@@ -11,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,6 +27,7 @@ public class TransferServiceImp implements TransferService {
     private final VehicleRepository vehicleRepository;
     private final PackageRepository packageRepository;
     private final ModelMapper modelMapper = new ModelMapper();
+    private final DirectionService directionService;
 
     @Override
     public List<Transfer> findAll() {
@@ -72,6 +77,61 @@ public class TransferServiceImp implements TransferService {
         return transfer.get().getPackages();
     }
 
+    @Override
+    public List<LatLng> calculateRoute(Long id) {
+        var transferOptional = transferRepository.findById(id);
+        var transfer = transferOptional.get();
+        final var routes = directionService.getRouteForTransfer(transfer);
+        transfer.setEncodedRoute(getEncodedRoute(routes));
+        transferRepository.save(transfer);
+        var time = setPickupTimeForPackages(routes.get(0), transfer.getPackages(), transfer.getStartTime());
+        setArriveTimeForPackages(routes.get(1), transfer.getPackages(), time);
+        transfer.getPackages().forEach(packageRepository::save);
+
+        return PolylineEncoding.decode(transfer.getEncodedRoute());
+    }
+
+    private LocalTime setPickupTimeForPackages(DirectionsRoute route, List<Package> packages, LocalTime startTime) {
+        int i = 0;
+        LocalTime time = startTime;
+        for (var leg : route.legs) {
+            if (i != route.legs.length - 1) {
+                time = time.plusSeconds(leg.duration.inSeconds);
+                var pack = packages.get(route.waypointOrder[i]);
+                pack.setPickupTime(time);
+            }
+            i++;
+        }
+        return time;
+    }
+
+    private void setArriveTimeForPackages(DirectionsRoute route, List<Package> packages, LocalTime startTime) {
+        int i = 0;
+        LocalTime time = startTime;
+        for (var leg : route.legs) {
+            if (i != route.legs.length - 1) {
+                time = time.plusSeconds(leg.duration.inSeconds);
+                var pack = packages.get(route.waypointOrder[i]);
+                pack.setArriveTime(time);
+            }
+            i++;
+        }
+    }
+    private String getEncodedRoute(List<DirectionsRoute> routes) {
+        var decodedLatLngList = new ArrayList<LatLng>();
+        int i = 0;
+        for (var leg : routes.get(0).legs) {
+            if (i != routes.get(0).legs.length - 1) {
+                for (var step : leg.steps) {
+                    decodedLatLngList.addAll(step.polyline.decodePath());
+                }
+            }
+            i++;
+        }
+        decodedLatLngList.addAll(routes.get(1).overviewPolyline.decodePath());
+
+        return PolylineEncoding.encode(decodedLatLngList);
+    }
     private List<Package> findPackages(Transfer transfer) {
         return packageRepository.findByTransferIsNullAndTownAndDateLimitAfterOrderByCreatedAt(transfer.getTown(), transfer.getCreatedAt());
     }
