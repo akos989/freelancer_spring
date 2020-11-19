@@ -5,7 +5,6 @@ import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.service.TransferService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,11 +35,5 @@ public class TransferController {
     @GetMapping("/{id}/packages")
     ResponseEntity<List<Package>> getPackages(@PathVariable Long id) {
         return ResponseEntity.ok(transferService.getPackages(id));
-    }
-
-    @GetMapping("/calculateRoute/{id}")
-    ResponseEntity calculateRoute(@PathVariable Long id) {
-//        transferService.calculateRoute(id);
-        return ResponseEntity.ok(transferService.calculateRoute(id));
     }
 }
