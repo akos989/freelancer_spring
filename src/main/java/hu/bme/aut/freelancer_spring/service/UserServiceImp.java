@@ -8,15 +8,15 @@ import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.model.User;
 import hu.bme.aut.freelancer_spring.model.Vehicle;
 import hu.bme.aut.freelancer_spring.repository.UserRepository;
+import hu.bme.aut.freelancer_spring.security.CustomUserDetails;
 import hu.bme.aut.freelancer_spring.security.JwtUtils;
-import hu.bme.aut.freelancer_spring.security.MyUserDetailsService;
+import hu.bme.aut.freelancer_spring.security.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,7 +31,7 @@ public class UserServiceImp implements UserService {
     private final ModelMapper modelMapper = new ModelMapper();
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final MyUserDetailsService myUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtils jwtUtils;
 
     @Override
@@ -69,8 +69,8 @@ public class UserServiceImp implements UserService {
         } catch (BadCredentialsException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad login credentials");
         }
-        final UserDetails userDetails = myUserDetailsService.loadUserByUsername(userLoginDto.getEmail());
-        return new JwtDto(jwtUtils.generateToken(userDetails), jwtUtils.getExpiresIn());
+        final CustomUserDetails userDetails = customUserDetailsService.loadUserByUsername(userLoginDto.getEmail());
+        return new JwtDto(userDetails.getUserId(), jwtUtils.generateToken(userDetails), jwtUtils.getExpiresIn());
     }
 
     @Override
