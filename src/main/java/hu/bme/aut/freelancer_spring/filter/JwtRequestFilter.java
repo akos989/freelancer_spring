@@ -1,7 +1,7 @@
 package hu.bme.aut.freelancer_spring.filter;
 
 import hu.bme.aut.freelancer_spring.security.JwtUtils;
-import hu.bme.aut.freelancer_spring.security.MyUserDetailsService;
+import hu.bme.aut.freelancer_spring.security.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +20,7 @@ import java.io.IOException;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    private final MyUserDetailsService myUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtils jwtUtils;
 
     @Override
@@ -39,7 +39,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.myUserDetailsService.loadUserByUsername(email);
+            UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(email);
             if (jwtUtils.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                   userDetails, null, userDetails.getAuthorities()
