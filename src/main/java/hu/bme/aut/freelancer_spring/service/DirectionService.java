@@ -8,7 +8,5 @@ import java.util.List;
 
 public interface DirectionService {
 
-    List<DirectionsRoute> getRouteForTransfer(Transfer transfer);
-
-    List<LatLng> getDirection();
+    List<DirectionsRoute> getRouteForTransfer(Transfer transfer, LatLng origin);
 }
