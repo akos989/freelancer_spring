@@ -1,5 +1,7 @@
 package hu.bme.aut.freelancer_spring.controller;
 
+import com.google.maps.model.LatLng;
+import hu.bme.aut.freelancer_spring.dto.NavigationDto;
 import hu.bme.aut.freelancer_spring.dto.TransferDto;
 import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Transfer;
@@ -35,5 +37,12 @@ public class TransferController {
     @GetMapping("/{id}/packages")
     ResponseEntity<List<Package>> getPackages(@PathVariable Long id) {
         return ResponseEntity.ok(transferService.getPackages(id));
+    }
+
+    @GetMapping("/{id}/navigationUrl")
+    ResponseEntity<NavigationDto> getNavigationUrl(@PathVariable Long id,
+                                                   @RequestParam Double originLat,
+                                                   @RequestParam Double originLong) {
+        return ResponseEntity.ok(transferService.getNavigationUrl(id, new LatLng(originLat, originLong)));
     }
 }

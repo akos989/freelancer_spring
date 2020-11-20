@@ -3,6 +3,7 @@ package hu.bme.aut.freelancer_spring.service;
 import com.google.maps.internal.PolylineEncoding;
 import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.LatLng;
+import hu.bme.aut.freelancer_spring.dto.NavigationDto;
 import hu.bme.aut.freelancer_spring.dto.TransferDto;
 import hu.bme.aut.freelancer_spring.model.Package;
 import hu.bme.aut.freelancer_spring.model.Transfer;
@@ -87,12 +88,42 @@ public class TransferServiceImp implements TransferService {
     public void calculateRoute(Transfer transfer) {
         if (transfer.getPackages().size() == 0)
             return;
-        final var routes = directionService.getRouteForTransfer(transfer);
+        final var routes =
+                directionService.getRouteForTransfer(transfer, new LatLng(transfer.getFromLat(), transfer.getFromLong()));
         transfer.setEncodedRoute(getEncodedRoute(routes));
         transferRepository.save(transfer);
         var time = setPickupTimeForPackages(routes.get(0), transfer.getPackages(), transfer.getStartTime());
         setArriveTimeForPackages(routes.get(1), transfer.getPackages(), time);
         transfer.getPackages().forEach(packageRepository::save);
+    }
+
+    @Override
+    public NavigationDto getNavigationUrl(Long id, LatLng origin) {
+        var transfer = transferRepository.findById(id);
+        if (transfer.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transfer not found with id: " + id);
+        }
+        var routes = directionService.getRouteForTransfer(transfer.get(), origin);
+
+        return new NavigationDto("https://www.google.com/maps/dir/?api=1" +
+                "&origin=" + origin.lat + "," + origin.lng +
+                "&destination=" + transfer.get().getToLat() + "," + transfer.get().getToLong() +
+                "&waypoints=" + getWaypointsUrlPart(routes.get(0)) + getWaypointsUrlPart(routes.get(1))
+        );
+        //format:  &origin=47.0120,19.121212&destination=47.1120,19.421212&waypoints=47.4120,19.121212|47.6120,19.121212|
+    }
+
+    private String getWaypointsUrlPart(DirectionsRoute route) {
+        int i = 0;
+        String waypointsUrl = "";
+        for (var leg : route.legs) {
+            if (i != route.legs.length - 1) {
+                waypointsUrl += leg.endLocation.lat + "," + leg.endLocation.lng + "|";
+            }
+            i++;
+        }
+
+        return waypointsUrl;
     }
 
     private LocalTime setPickupTimeForPackages(DirectionsRoute route, List<Package> packages, LocalTime startTime) {
