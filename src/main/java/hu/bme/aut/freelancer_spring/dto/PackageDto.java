@@ -26,11 +26,7 @@ public class PackageDto {
 
     private double toLong;
 
-    private Status status;
-
     private Long senderId;
-
-    private Long transferId;
 
     private Date dateLimit;
 
