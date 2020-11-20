@@ -2,7 +2,6 @@ package hu.bme.aut.freelancer_spring.service;
 
 import hu.bme.aut.freelancer_spring.dto.PackageDto;
 import hu.bme.aut.freelancer_spring.model.Package;
-import hu.bme.aut.freelancer_spring.model.Town;
 import hu.bme.aut.freelancer_spring.model.Transfer;
 import hu.bme.aut.freelancer_spring.model.enums.Status;
 import hu.bme.aut.freelancer_spring.repository.PackageRepository;
@@ -63,7 +62,7 @@ public class PackageServiceImp implements PackageService {
     @Override
     public boolean changeStatus(Long packageId, Status status) {
         var pack = packageRepository.findById(packageId);
-        if (pack.isPresent()) {
+        if (pack.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Package not found with id: " + packageId);
         }
         var p = pack.get();
@@ -73,8 +72,6 @@ public class PackageServiceImp implements PackageService {
     }
 
     private Optional<Transfer> findTransfer(Package pack) {
-        var town = pack.getTown();
-        var createdAT = pack.getCreatedAt();
         var transfers =
                 transferRepository.findAllByTownAndDateAfterOrderByDateAscCreatedAtAsc(pack.getTown(), pack.getCreatedAt());
         return transfers.stream()
