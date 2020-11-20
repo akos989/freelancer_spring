@@ -1,6 +1,7 @@
 package hu.bme.aut.freelancer_spring.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,6 +32,7 @@ public class User {
     @Column(name = "phonenumber")
     private String phonenumber;
 
+    @JsonIgnore
     @Column(name = "password")
     private String password;
 
