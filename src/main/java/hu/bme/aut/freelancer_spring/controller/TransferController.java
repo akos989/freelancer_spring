@@ -33,7 +33,7 @@ public class TransferController {
     ResponseEntity<Boolean> delete(@PathVariable Long id) {
         return ResponseEntity.ok(transferService.delete(id));
     }
-
+  
     @GetMapping("/packages/{id}")
     ResponseEntity<List<Package>> getPackages(@PathVariable Long id) {
         return ResponseEntity.ok(transferService.getPackages(id));

@@ -63,7 +63,7 @@ public class PackageServiceImp implements PackageService {
     @Override
     public boolean changeStatus(Long packageId, Status status) {
         var pack = packageRepository.findById(packageId);
-        if (pack.isPresent()) {
+        if (pack.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Package not found with id: " + packageId);
         }
         var p = pack.get();
