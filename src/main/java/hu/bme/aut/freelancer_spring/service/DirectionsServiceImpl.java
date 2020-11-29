@@ -52,8 +52,12 @@ public class DirectionsServiceImpl implements DirectionService {
             var lastPackage = transfer.getPackages().get(lastPackageWaypointIdx);
             lastPickupLatLng = new LatLng(lastPackage.getFromLat(), lastPackage.getFromLong());
         }
-
-        var deliveryRoute = getDeliveryRoute(lastPickupLatLng, destination, transfer.getPackages());
+        DirectionsRoute deliveryRoute;
+        if (waitingNum == 0 && incarNum > 0) {
+            deliveryRoute = getPickupRoute(origin, destination, transfer.getPackages());
+        } else {
+            deliveryRoute = getDeliveryRoute(lastPickupLatLng, destination, transfer.getPackages());
+        }
 
         var routeList = new ArrayList<DirectionsRoute>();
         routeList.add(pickUpRoute);
