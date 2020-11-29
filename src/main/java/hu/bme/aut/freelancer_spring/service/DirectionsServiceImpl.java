@@ -3,6 +3,7 @@ package hu.bme.aut.freelancer_spring.service;
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.internal.PolylineEncoding;
+import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.LatLng;
@@ -30,13 +31,27 @@ public class DirectionsServiceImpl implements DirectionService {
 
     @Override
     public List<DirectionsRoute> getRouteForTransfer(Transfer transfer, LatLng origin) {
+        var waitingNum = transfer.getPackages().stream()
+                .filter(p -> p.getStatus() == Status.WAITING)
+                .count();
+        var incarNum = transfer.getPackages().stream()
+                .filter(p -> p.getStatus() == Status.INCAR)
+                .count();
+
+        if (incarNum + waitingNum == 0)
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "No packages to deliver");
         LatLng destination = new LatLng(transfer.getToLat(), transfer.getToLong());
 
-        var pickUpRoute = getPickupRoute(origin, destination, transfer.getPackages());
-
-        int lastPackageWaypointIdx = pickUpRoute.waypointOrder[pickUpRoute.waypointOrder.length - 1];
-        var lastPackage = transfer.getPackages().get(lastPackageWaypointIdx);
-        LatLng lastPickupLatLng = new LatLng(lastPackage.getFromLat(), lastPackage.getFromLong());
+        var pickUpRoute = new DirectionsRoute();
+        DirectionsLeg[] legs = {};
+        pickUpRoute.legs = legs;
+        LatLng lastPickupLatLng = origin;
+        if (waitingNum != 0) {
+            pickUpRoute = getPickupRoute(origin, destination, transfer.getPackages());
+            int lastPackageWaypointIdx = pickUpRoute.waypointOrder[pickUpRoute.waypointOrder.length - 1];
+            var lastPackage = transfer.getPackages().get(lastPackageWaypointIdx);
+            lastPickupLatLng = new LatLng(lastPackage.getFromLat(), lastPackage.getFromLong());
+        }
 
         var deliveryRoute = getDeliveryRoute(lastPickupLatLng, destination, transfer.getPackages());
 
