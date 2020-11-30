@@ -66,6 +66,13 @@ public class Transfer {
     @OneToMany(mappedBy = "transfer")
     private List<Package> packages = new ArrayList<>();
 
+    @PreRemove
+    private void preRemove() {
+        for (var pack : packages) {
+            pack.setTransfer(null);
+        }
+    }
+
     public boolean fitPackage(Package newPackage) {
         if (date.before(newPackage.getDateLimit()) && suitableInsurance(newPackage)) {
             return vehicle.isBelowWeightLimit(getPackagesWeightSum() + newPackage.getWeight())
