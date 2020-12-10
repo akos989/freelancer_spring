@@ -26,7 +26,7 @@ public class DirectionsServiceImpl implements DirectionService {
 
     private final GeoApiContext geoApiContext = new GeoApiContext
             .Builder()
-            .apiKey("AIzaSyCCRJFDFXJpHmDdFyFwd9g1yOtU9pOLQAU")
+            .apiKey("AIzaSyBPYPWC__LjvY2Dyi93o4K3NV5yjhNOXIU")
             .build();
 
     @Override
