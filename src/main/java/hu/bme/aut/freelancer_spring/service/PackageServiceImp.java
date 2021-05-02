@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +34,7 @@ public class PackageServiceImp implements PackageService {
         return packageRepository.findAll();
     }
 
+    @Transactional
     @Override
     public Long save(PackageDto packageDto) {
         var sender = userRepository.findById(packageDto.getSenderId());
@@ -50,6 +52,7 @@ public class PackageServiceImp implements PackageService {
         return pack.getId();
     }
 
+    @Transactional
     @Override
     public boolean delete(Long id) {
         var pack = packageRepository.findById(id);
@@ -60,6 +63,7 @@ public class PackageServiceImp implements PackageService {
         return true;
     }
 
+    @Transactional
     @Override
     public boolean changeStatus(Long packageId, Status status) {
         var pack = packageRepository.findById(packageId);
@@ -72,6 +76,11 @@ public class PackageServiceImp implements PackageService {
         return true;
     }
 
+    /**
+     * Automatically called when a package is created. Looks for transfers in the db and tries the place the package in one.
+     * @param pack newly created package
+     * @return Optional object which holds a Transfer if one was found
+     */
     private Optional<Transfer> findTransfer(Package pack) {
         var town = pack.getTown();
         var createdAT = pack.getCreatedAt();

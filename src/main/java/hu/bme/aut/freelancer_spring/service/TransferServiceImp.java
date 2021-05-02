@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +37,7 @@ public class TransferServiceImp implements TransferService {
         return transferRepository.findAll();
     }
 
+    @Transactional
     @Override
     public Long save(TransferDto transferDto) {
         var carrier = userRepository.findById(transferDto.getCarrierId());
@@ -60,6 +62,7 @@ public class TransferServiceImp implements TransferService {
         return transfer.getId();
     }
 
+    @Transactional
     @Override
     public boolean delete(Long id) {
         var transfer = transferRepository.findById(id);
@@ -84,6 +87,12 @@ public class TransferServiceImp implements TransferService {
         return transferRepository.findAllByDate(date);
     }
 
+    /**
+     * This is called by the scheduler to calculate the route for the transfer.
+     * It also saves the estimated pick up and delivery times for the packages.
+     * @param transfer Transfer to calculate the route for
+     */
+    @Transactional
     @Override
     public void calculateRoute(Transfer transfer) {
         if (transfer.getPackages().size() == 0)
@@ -97,6 +106,12 @@ public class TransferServiceImp implements TransferService {
         transfer.getPackages().forEach(packageRepository::save);
     }
 
+    /**
+     * Calculated the optimal route for a transfer from a starting point
+     * @param id ID of the transfer to calculate the route
+     * @param origin The starting point from which to calculate
+     * @return NavigationDto which holds a string with the and url that opens Google Maps and starts a navigation with the calcualted route
+     */
     @Override
     public NavigationDto getNavigationUrl(Long id, LatLng origin) {
         var transfer = transferRepository.findById(id);
@@ -115,15 +130,15 @@ public class TransferServiceImp implements TransferService {
 
     private String getWaypointsUrlPart(DirectionsRoute route) {
         int i = 0;
-        String waypointsUrl = "";
+        StringBuilder waypointsUrl = new StringBuilder();
         for (var leg : route.legs) {
             if (i != route.legs.length - 1) {
-                waypointsUrl += leg.endLocation.lat + "," + leg.endLocation.lng + "|";
+                waypointsUrl.append(leg.endLocation.lat).append(",").append(leg.endLocation.lng).append("|");
             }
             i++;
         }
 
-        return waypointsUrl;
+        return waypointsUrl.toString();
     }
 
     private LocalTime setPickupTimeForPackages(DirectionsRoute route, List<Package> packages, LocalTime startTime) {
@@ -152,6 +167,13 @@ public class TransferServiceImp implements TransferService {
             i++;
         }
     }
+
+    /**
+     * Routes have all the LatLng points in an encoded string. To combine multiple routes you cannot just concat the strings.
+     * They need to be decoded back to a list LatLng and together encoded back to string.
+     * @param routes routes to combine
+     * @return encoded string of the combined routes
+     */
     private String getEncodedRoute(List<DirectionsRoute> routes) {
         var decodedLatLngList = new ArrayList<LatLng>();
         int i = 0;
@@ -170,6 +192,10 @@ public class TransferServiceImp implements TransferService {
     private List<Package> findPackages(Transfer transfer) {
         return packageRepository.findByTransferIsNullAndTownAndDateLimitAfterOrderByCreatedAt(transfer.getTown(), transfer.getCreatedAt());
     }
+
+    /**
+     * Tries the save the packages in a transfer.
+     */
     private void storePackages(Transfer transfer, List<Package> packages) {
         packages.forEach(pack -> {
             if (transfer.fitPackage(pack)) {

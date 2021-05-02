@@ -2,7 +2,6 @@ package hu.bme.aut.freelancer_spring.service;
 
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
-import com.google.maps.internal.PolylineEncoding;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,19 +24,28 @@ public class DirectionsServiceImpl implements DirectionService {
 
     private final GeoApiContext geoApiContext = new GeoApiContext
             .Builder()
-            .apiKey("AIzaSyBPYPWC__LjvY2Dyi93o4K3NV5yjhNOXIU")
+            .apiKey("AIzaSyBPYPWC__LjvY2Dyi93o4K3NV5yjhNOXIU") // this API key is not active anymore, so route calculating functions are not available
             .build();
 
+    /**
+     * Calculates the optimal route for a transfer from a given starting point. This is done in the phases.
+     * In the 1st one finds the route to pick up all the packages.
+     * In the 2nd ont finds the route to deliver the packages.
+     * @param transfer: the transfer for which the route is calculated
+     * @param origin: the starting point in LatLng
+     * @return two DirectionRoute objects with the two phases
+     */
     @Override
     public List<DirectionsRoute> getRouteForTransfer(Transfer transfer, LatLng origin) {
-        var waitingNum = transfer.getPackages().stream()
+        var packages = transfer.getPackages();
+        var waitingNum = packages.stream()
                 .filter(p -> p.getStatus() == Status.WAITING)
                 .count();
-        var incarNum = transfer.getPackages().stream()
+        var inCarNum = packages.stream()
                 .filter(p -> p.getStatus() == Status.INCAR)
                 .count();
 
-        if (incarNum + waitingNum == 0)
+        if (inCarNum + waitingNum == 0)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "No packages to deliver");
         LatLng destination = new LatLng(transfer.getToLat(), transfer.getToLong());
 
@@ -46,6 +53,7 @@ public class DirectionsServiceImpl implements DirectionService {
         DirectionsLeg[] legs = {};
         pickUpRoute.legs = legs;
         LatLng lastPickupLatLng = origin;
+        // only need the get the pick up route if there are still packages waiting for pick up
         if (waitingNum != 0) {
             pickUpRoute = getPickupRoute(origin, destination, transfer.getPackages());
             int lastPackageWaypointIdx = pickUpRoute.waypointOrder[pickUpRoute.waypointOrder.length - 1];
@@ -53,7 +61,7 @@ public class DirectionsServiceImpl implements DirectionService {
             lastPickupLatLng = new LatLng(lastPackage.getFromLat(), lastPackage.getFromLong());
         }
         DirectionsRoute deliveryRoute;
-        if (waitingNum == 0 && incarNum > 0) {
+        if (waitingNum == 0 && inCarNum > 0) {
             deliveryRoute = getPickupRoute(origin, destination, transfer.getPackages());
         } else {
             deliveryRoute = getDeliveryRoute(lastPickupLatLng, destination, transfer.getPackages());
@@ -88,6 +96,13 @@ public class DirectionsServiceImpl implements DirectionService {
         return getDirectionResult(origin, destination, waypoints).routes[0];
     }
 
+    /**
+     * Google API call to calculate the optimal route between waypoints.
+     * @param origin first waypoint
+     * @param destination last waypoints
+     * @param waypoints in-between waypoints
+     * @return the object which holds the route
+     */
     private DirectionsResult getDirectionResult(LatLng origin, LatLng destination, List<LatLng> waypoints) {
         DirectionsResult result;
         try {

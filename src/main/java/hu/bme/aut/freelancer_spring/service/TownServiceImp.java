@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -22,6 +23,7 @@ public class TownServiceImp implements TownService {
         return townRepository.findAll();
     }
 
+    @Transactional
     @Override
     public Long save(Town town) {
         var exists = townRepository.findByName(town.getName());
@@ -32,6 +34,7 @@ public class TownServiceImp implements TownService {
         return town.getId();
     }
 
+    @Transactional
     @Override
     public boolean delete(Long id) {
         var town = townRepository.findById(id);
@@ -42,6 +45,7 @@ public class TownServiceImp implements TownService {
         return true;
     }
 
+    @Transactional
     @Override
     public List<Package> getPackages(Long id) {
         var town = townRepository.findById(id);
@@ -51,6 +55,7 @@ public class TownServiceImp implements TownService {
         return town.get().getPackages();
     }
 
+    @Transactional
     @Override
     public List<Transfer> getTransfers(Long id) {
         var town = townRepository.findById(id);

@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -47,6 +48,12 @@ public class UserServiceImp implements UserService {
         return user.get();
     }
 
+    /**
+     * Registering a new user
+     * @param userRegistrationDto the registration parameters
+     * @return the ID of the new user
+     */
+    @Transactional
     @Override
     public Long save(UserRegistrationDto userRegistrationDto) {
         var existingUser = userRepository.findByEmail(userRegistrationDto.getEmail());
@@ -73,6 +80,7 @@ public class UserServiceImp implements UserService {
         return new JwtDto(userDetails.getUserId(), jwtUtils.generateToken(userDetails), jwtUtils.getExpiresIn());
     }
 
+    @Transactional
     @Override
     public boolean delete(Long id) {
         var user = userRepository.findById(id);
@@ -83,6 +91,7 @@ public class UserServiceImp implements UserService {
         return true;
     }
 
+    @Transactional
     @Override
     public boolean changeInsurance(Long id, boolean newInsurance) {
         var user = userRepository.findById(id);

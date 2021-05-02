@@ -14,6 +14,10 @@ import java.util.Date;
 public class Scheduler {
     private final TransferService transferService;
 
+
+    /**
+     * This is a scheduled function which runs every day at 3 a.m. It calculates the optimal route which for all the transfers on the next day.
+     */
     @Scheduled(cron = "0 0 3 * * *")
     @Transactional
     public void RouteCalculateJob() {

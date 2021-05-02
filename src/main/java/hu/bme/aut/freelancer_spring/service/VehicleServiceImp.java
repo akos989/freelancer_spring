@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -26,6 +27,7 @@ public class VehicleServiceImp implements VehicleService {
         return vehicleRepository.findAll();
     }
 
+    @Transactional
     @Override
     public Long save(VehicleDto vehicleDto) {
         var owner = userRepository.findById(vehicleDto.getOwnerId());
@@ -37,6 +39,7 @@ public class VehicleServiceImp implements VehicleService {
         return vehicle.getId();
     }
 
+    @Transactional
     @Override
     public boolean delete(Long id) {
         var vehicle = vehicleRepository.findById(id);
