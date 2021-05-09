@@ -2,6 +2,7 @@ package hu.bme.aut.freelancer_spring.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "transfer_entity")
 @Getter @Setter
+@NoArgsConstructor
 public class Transfer {
 
     @Id
@@ -99,5 +101,11 @@ public class Transfer {
 
     public void addPackage(Package pack) {
         packages.add(pack);
+    }
+
+    public Transfer(Date createdAt, double fromLat, double fromLong) {
+        this.createdAt = createdAt;
+        this.fromLat = fromLat;
+        this.fromLong = fromLong;
     }
 }

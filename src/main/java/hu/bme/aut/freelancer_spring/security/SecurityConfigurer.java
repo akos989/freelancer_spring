@@ -1,7 +1,9 @@
 package hu.bme.aut.freelancer_spring.security;
 
 import hu.bme.aut.freelancer_spring.filter.JwtRequestFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -13,8 +15,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.Arrays;
+
 @EnableWebSecurity
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    Environment env;
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtRequestFilter jwtRequestFilter;
@@ -42,15 +49,17 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/users").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/users").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/users/login").permitAll()
-                .anyRequest().authenticated()
-                .and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
+        String activeProfile = Arrays.asList(env.getActiveProfiles()).get(0);
+        if ("prod".equals(activeProfile)) {
+            http.csrf().disable()
+                    .authorizeRequests()
+                    .antMatchers(HttpMethod.POST, "/api/users").permitAll()
+                    .antMatchers(HttpMethod.GET, "/api/users").permitAll()
+                    .antMatchers(HttpMethod.POST, "/api/users/login").permitAll()
+                    .anyRequest().authenticated()
+                    .and().sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        }
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }
